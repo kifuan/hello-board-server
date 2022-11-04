@@ -16,18 +16,8 @@ func Run() {
 	router.Run(PORT)
 }
 
-func responseJSON(data interface{}, message string, success bool) gin.H {
-	return gin.H{
-		"data":    data,
-		"success": success,
-		"message": message,
-	}
-}
-
 func errorJSON(err error) gin.H {
-	return responseJSON(nil, err.Error(), false)
-}
-
-func successJSON(data interface{}) gin.H {
-	return responseJSON(data, "", true)
+	return gin.H{
+		"message": err.Error(),
+	}
 }

@@ -3,7 +3,6 @@ package models
 import (
 	"crypto/md5"
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 )
@@ -16,24 +15,19 @@ type Message struct {
 	Content    string `json:"content"`
 	Site       string `json:"site"`
 	Reply      int    `json:"reply"`
-	Email      string `json:"-"`
-	MailNotice bool   `json:"-"`
+	Email      string `json:"email,omitempty"`
+	MailNotice bool   `json:"mailNotice,omitempty"`
 }
 
 func getGravatarAvatar(email string) string {
 	data := []byte(strings.ToLower(email))
-	str := fmt.Sprintf("%x", md5.Sum(data))
-	path, err := url.JoinPath(GRAVATAR, str)
-	if err != nil {
-		panic("invalid gravatar url.")
-	}
-	return path
+	return fmt.Sprintf("%x", md5.Sum(data))
 }
 
 func InsertMessage(m Message) (Message, error) {
 	f := Message{
 		Avatar:     getGravatarAvatar(m.Email),
-		Date:       time.Now().Unix(),
+		Date:       time.Now().UnixMicro(),
 		Name:       m.Name,
 		Content:    m.Content,
 		Site:       m.Site,
@@ -41,6 +35,8 @@ func InsertMessage(m Message) (Message, error) {
 		Email:      m.Email,
 		MailNotice: m.MailNotice,
 	}
+
+	// TODO notice the message it replied to.
 
 	if err := db.Create(&f).Error; err != nil {
 		return f, err
@@ -50,7 +46,7 @@ func InsertMessage(m Message) (Message, error) {
 }
 
 func GetAllMessages() (messages []Message, err error) {
-	if err = db.Find(&messages).Error; err != nil {
+	if err = db.Select("id, avatar, date, name, content, site, reply").Find(&messages).Error; err != nil {
 		return messages, fmt.Errorf("failed to get all messages: %w", err)
 	}
 	return

@@ -16,7 +16,7 @@ func addMessageRoutes(rg *gin.RouterGroup) {
 			ctx.JSON(http.StatusInternalServerError, errorJSON(err))
 			return
 		}
-		ctx.JSON(http.StatusOK, successJSON(messages))
+		ctx.JSON(http.StatusOK, messages)
 	})
 
 	g.POST("", func(ctx *gin.Context) {
@@ -30,6 +30,6 @@ func addMessageRoutes(rg *gin.RouterGroup) {
 			ctx.JSON(http.StatusInternalServerError, errorJSON(err))
 			return
 		}
-		ctx.JSON(http.StatusOK, successJSON(nil))
+		ctx.JSON(http.StatusOK, msg)
 	})
 }
