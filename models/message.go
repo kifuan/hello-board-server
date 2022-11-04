@@ -48,3 +48,10 @@ func InsertMessage(m Message) (Message, error) {
 
 	return f, nil
 }
+
+func GetAllMessages() (messages []Message, err error) {
+	if err = db.Find(&messages).Error; err != nil {
+		return messages, fmt.Errorf("failed to get all messages: %w", err)
+	}
+	return
+}
