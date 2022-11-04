@@ -27,7 +27,7 @@ func getGravatarAvatar(email string) string {
 func InsertMessage(m Message) (Message, error) {
 	f := Message{
 		Avatar:     getGravatarAvatar(m.Email),
-		Date:       time.Now().UnixMicro(),
+		Date:       time.Now().UnixMilli(),
 		Name:       m.Name,
 		Content:    m.Content,
 		Site:       m.Site,
