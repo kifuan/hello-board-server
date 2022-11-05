@@ -7,6 +7,7 @@ import (
 )
 
 var (
+	Site        = os.Getenv("SITE")
 	DSN         = os.Getenv("DSN")
 	AdminEmail  = os.Getenv("ADMIN_EMAIL")
 	AdminSecret = os.Getenv("ADMIN_SECRET")

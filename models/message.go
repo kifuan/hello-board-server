@@ -108,13 +108,14 @@ func sendEmailNotice(content string, id int) error {
 		"content": content,
 		"id":      message.ID,
 		"key":     message.GenerateUnsubscribeKey(),
+		"site":    Site,
 	})
+
 	if err != nil {
 		return err
 	}
 
 	m.SetBody("text/html", body)
-
 	d := gomail.NewDialer(MailHost, MailPort, MailAccount, MailPassword)
 	if err := d.DialAndSend(m); err != nil {
 		return fmt.Errorf("failed to send email: %w", err)
