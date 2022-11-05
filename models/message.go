@@ -37,6 +37,25 @@ func (m *Message) initFromUploading() {
 	m.Date = time.Now().UnixMilli()
 }
 
+// Makes it reply to a root message.
+func (m *Message) fixReply() error {
+	if m.Reply == -1 {
+		return nil
+	}
+	m.Content = fmt.Sprintf("Reply to #%d: %s", m.Reply, m.Content)
+
+	reply := *m
+	var err error
+	for reply.Reply != -1 {
+		reply, err = GetFullMessage(reply.Reply)
+		if err != nil {
+			return fmt.Errorf("error fixing reply: %w", err)
+		}
+	}
+	m.Reply = reply.ID
+	return nil
+}
+
 // Inserts the message to database.
 func InsertMessage(m *Message) error {
 	// Check for the email first.
@@ -56,6 +75,11 @@ func InsertMessage(m *Message) error {
 		// current message has no problem. It is
 		// due to the reply message.
 		logrus.Error(err)
+	}
+
+	// Fix the reply id, letting it reply to the root message.
+	if err := m.fixReply(); err != nil {
+		return err
 	}
 
 	if err := db.Create(m).Error; err != nil {
