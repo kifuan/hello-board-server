@@ -25,10 +25,9 @@ type Message struct {
 	Owner      bool   `json:"owner,omitempty"`
 }
 
-// Generates unsubscribe key for validation.
-func (m Message) GenerateUnsubscribeKey() string {
-	str := fmt.Sprintf("%d%s%s", m.ID, m.Email, UnsubscribeSalt)
-	return fmt.Sprintf("%x", md5.Sum([]byte(str)))
+func GenerateUnsubscribeEmailKey(email string) string {
+	data := []byte(fmt.Sprintf("%s%s", email, UnsubscribeSalt))
+	return fmt.Sprintf("%x", md5.Sum(data))
 }
 
 // Initializes the message from uploading.
@@ -139,8 +138,8 @@ func GetFullMessage(id int) (m Message, err error) {
 }
 
 // Unsubscribes mail notice.
-func UnsubscribeMailNotice(id int) error {
-	if err := db.Model(&Message{}).Where("id=?", id).Update("mail_notice", false).Error; err != nil {
+func UnsubscribeEmail(email string) error {
+	if err := db.Model(&Message{}).Where("email=?", email).Update("mail_notice", false).Error; err != nil {
 		return fmt.Errorf("failed to unsubscribe: %w", err)
 	}
 	return nil
@@ -170,8 +169,7 @@ func sendEmailNotice(replyName string, content string, id int) error {
 	body, err := parseEmailBody(map[string]any{
 		"name":      message.Name,
 		"content":   content,
-		"id":        message.ID,
-		"key":       message.GenerateUnsubscribeKey(),
+		"key":       GenerateUnsubscribeEmailKey(message.Email),
 		"site":      Site,
 		"replyName": replyName,
 	})

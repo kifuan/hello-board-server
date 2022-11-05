@@ -27,13 +27,13 @@ func addUnsubscribeRoutes(rg *gin.RouterGroup) {
 			return
 		}
 
-		if message.GenerateUnsubscribeKey() != key {
+		if models.GenerateUnsubscribeEmailKey(message.Email) != key {
 			logrus.Warnf("attempted to unsubscribe %d with wrong key %s, client ip: %s", id, key, ctx.ClientIP())
 			ctx.String(http.StatusBadRequest, "Invalid key")
 			return
 		}
 
-		if err := models.UnsubscribeMailNotice(message.ID); err != nil {
+		if err := models.UnsubscribeEmail(message.Email); err != nil {
 			logrus.Warnf("failed to update database: %s", err)
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
