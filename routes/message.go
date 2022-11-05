@@ -26,7 +26,7 @@ func addMessageRoutes(rg *gin.RouterGroup) {
 			ctx.JSON(http.StatusBadRequest, errorJSON(fmt.Errorf("failed to parse request body: %w", err)))
 			return
 		}
-		if msg, err = models.InsertMessage(msg); err != nil {
+		if err = models.InsertMessage(&msg); err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorJSON(err))
 			return
 		}

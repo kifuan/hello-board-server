@@ -2,6 +2,7 @@ package models
 
 import (
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -24,25 +25,27 @@ func getGravatarAvatar(email string) string {
 	return fmt.Sprintf("%x", md5.Sum(data))
 }
 
-func InsertMessage(m Message) (Message, error) {
-	f := Message{
-		Avatar:     getGravatarAvatar(m.Email),
-		Date:       time.Now().UnixMilli(),
-		Name:       m.Name,
-		Content:    m.Content,
-		Site:       m.Site,
-		Reply:      m.Reply,
-		Email:      m.Email,
-		MailNotice: m.MailNotice,
+func InsertMessage(m *Message) error {
+	// Check for the email first.
+	if m.Email == ADMIN_EMAIL {
+		return errors.New("Don't try to use my email!")
 	}
+
+	if m.Email == ADMIN_SECRET {
+		m.Email = ADMIN_EMAIL
+	}
+
+	// Generate avatar in md5 and time.
+	m.Avatar = getGravatarAvatar(m.Email)
+	m.Date = time.Now().UnixMilli()
 
 	// TODO notice the message it replied to.
 
-	if err := db.Create(&f).Error; err != nil {
-		return f, err
+	if err := db.Create(m).Error; err != nil {
+		return err
 	}
 
-	return f, nil
+	return nil
 }
 
 func GetAllMessages() (messages []Message, err error) {
