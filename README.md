@@ -15,7 +15,7 @@ Backend server for [Hello Board](https://github.com/kifuan/hello-board).
 1. Clone this repository
 
    ```bash
-git clone https://github.com/kifuan/hello-board-server.git
+   git clone https://github.com/kifuan/hello-board-server.git
    ```
    
 2. Prepare `.env`
