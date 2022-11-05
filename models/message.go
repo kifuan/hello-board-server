@@ -21,6 +21,7 @@ type Message struct {
 	Owner      bool   `json:"owner,omitempty"`
 }
 
+// Generates key to unsubscribe email notifications.
 func GenerateUnsubscribeEmailKey(email string) string {
 	data := []byte(fmt.Sprintf("%s%s", email, UnsubscribeSalt))
 	return fmt.Sprintf("%x", md5.Sum(data))
@@ -139,6 +140,7 @@ func UnsubscribeEmail(email string) error {
 	return nil
 }
 
+// Count total messages and root messages.
 func CountMessages() (totalCount int64, rootCount int64, err error) {
 	if err = db.Model(&Message{}).Count(&totalCount).Error; err != nil {
 		return 0, 0, fmt.Errorf("failed to count total: %w", err)
