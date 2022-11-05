@@ -67,7 +67,7 @@ func InsertMessage(m *Message) error {
 
 // Gets all messages, without Email and MailNotice fields.
 func GetAllMessages() (messages []Message, err error) {
-	if err = db.Select("id, avatar, date, name, content, site, reply").Find(&messages).Error; err != nil {
+	if err = db.Select("id, avatar, date, name, content, site, reply").Order("date DESC").Find(&messages).Error; err != nil {
 		return messages, fmt.Errorf("failed to get all messages: %w", err)
 	}
 	return
