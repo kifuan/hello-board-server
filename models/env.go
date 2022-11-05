@@ -13,6 +13,7 @@ var (
 	AdminSecret = os.Getenv("ADMIN_SECRET")
 
 	UnsubscribeSalt = os.Getenv("UNSUBSCRIBE_SALT")
+	PageSize, _     = strconv.Atoi(os.Getenv("PAGE_SIZE"))
 
 	MailPort, _    = strconv.Atoi(os.Getenv("MAIL_PORT"))
 	MailHost       = os.Getenv("MAIL_HOST")

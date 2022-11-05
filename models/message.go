@@ -91,21 +91,51 @@ func InsertMessage(m *Message) error {
 	return nil
 }
 
+func getRepliesFor(id int, page int) (messages []Message, err error) {
+	d := db.Select("id, avatar, date, name, content, site, reply, owner").Where("reply=?", id).Order("date DESC")
+	// Only limit root messages.
+	if id == -1 {
+		d = d.Offset(page * PageSize).Limit(PageSize)
+	}
+
+	if err = d.Find(&messages).Error; err != nil {
+		err = fmt.Errorf("failed to get replies for %d: %w", id, err)
+		return messages, err
+	}
+	return messages, nil
+}
+
+// Gets messages for specified page.
+func GetMessages(page int) (messages []Message, err error) {
+	root, err := getRepliesFor(-1, page)
+	if err != nil {
+		return messages, err
+	}
+	for _, r := range root {
+		replies, err := getRepliesFor(r.ID, page)
+		if err != nil {
+			return messages, err
+		}
+		messages = append(messages, replies...)
+	}
+	return append(root, messages...), nil
+}
+
 // Gets all messages, without Email and MailNotice fields.
 func GetAllMessages() (messages []Message, err error) {
 	if err = db.Select("id, avatar, date, name, content, site, reply, owner").Order("date DESC").Find(&messages).Error; err != nil {
 		return messages, fmt.Errorf("failed to get all messages: %w", err)
 	}
-	return
+	return messages, nil
 }
 
 // Gets full message, including Email and MailNotice.
 func GetFullMessage(id int) (m Message, err error) {
 	if err = db.Where("id=?", id).Find(&m).Error; err != nil {
 		err = fmt.Errorf("failed to find message with id %d: %w", id, err)
-		return
+		return m, err
 	}
-	return
+	return m, nil
 }
 
 // Unsubscribes mail notice.

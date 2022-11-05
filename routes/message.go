@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"kifuan.me/hello-board-server/models"
@@ -11,7 +12,12 @@ import (
 func addMessageRoutes(rg *gin.RouterGroup) {
 	g := rg.Group("messages")
 	g.GET("", func(ctx *gin.Context) {
-		messages, err := models.GetAllMessages()
+		page, err := strconv.Atoi(ctx.Query("page"))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorJSON(err))
+		}
+
+		messages, err := models.GetMessages(page)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorJSON(err))
 			return
