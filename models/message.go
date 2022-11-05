@@ -33,7 +33,7 @@ func (m Message) GenerateUnsubscribeKey() string {
 // Initializes the message from uploading.
 func (m *Message) initFromUploading() {
 	data := []byte(strings.ToLower(m.Email))
-	m.Email = fmt.Sprintf("%x", md5.Sum(data))
+	m.Avatar = fmt.Sprintf("%x", md5.Sum(data))
 	m.Date = time.Now().UnixMilli()
 }
 
