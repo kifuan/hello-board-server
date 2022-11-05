@@ -24,10 +24,15 @@ type Message struct {
 	MailNotice bool   `json:"mailNotice,omitempty"`
 }
 
-// Gets gravatar id(lower-case md5)
-func getGravatarAvatar(email string) string {
-	data := []byte(strings.ToLower(email))
-	return fmt.Sprintf("%x", md5.Sum(data))
+func (m Message) GenerateUnsubscribeKey() string {
+	str := fmt.Sprintf("%d%s%s", m.ID, m.Email, UnsubscribeSalt)
+	return fmt.Sprintf("%x", md5.Sum([]byte(str)))
+}
+
+func (m *Message) initFromUploading() {
+	data := []byte(strings.ToLower(m.Email))
+	m.Email = fmt.Sprintf("%x", md5.Sum(data))
+	m.Date = time.Now().UnixMilli()
 }
 
 // Inserts the message to database.
@@ -41,9 +46,8 @@ func InsertMessage(m *Message) error {
 		m.Email = ADMIN_EMAIL
 	}
 
-	// Generate avatar in md5 and time.
-	m.Avatar = getGravatarAvatar(m.Email)
-	m.Date = time.Now().UnixMilli()
+	// Initializes it.
+	m.initFromUploading()
 
 	if err := sendEmailNotice(m.Content, m.Reply); err != nil {
 		// We don't return this error because
@@ -96,8 +100,11 @@ func sendEmailNotice(content string, id int) error {
 	m.SetHeader("To", message.Email)
 	m.SetHeader("Subject", MAIL_SUBJECT)
 
-	body, err := parseEmailBody(map[string]string{
+	body, err := parseEmailBody(map[string]any{
+		"name":    message.Name,
 		"content": content,
+		"id":      message.ID,
+		"key":     message.GenerateUnsubscribeKey(),
 	})
 	if err != nil {
 		return err

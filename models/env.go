@@ -17,6 +17,7 @@ var (
 	MAIL_ACCOUNT     = os.Getenv("MAIL_ACCOUNT")
 	MAIL_PASSWORD    = os.Getenv("MAIL_PASSWORD")
 	MAIL_SUBJECT     = os.Getenv("MAIL_SUBJECT")
+	UnsubscribeSalt  = os.Getenv("UNSUBSCRIBE_SALT")
 
 	MailTemplate *template.Template
 )
