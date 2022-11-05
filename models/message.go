@@ -196,3 +196,10 @@ func parseEmailBody(data any) (string, error) {
 	}
 	return buf.String(), nil
 }
+
+func CountMessages() (count int64, err error) {
+	if err = db.Model(&Message{}).Count(&count).Error; err != nil {
+		return 0, fmt.Errorf("failed to count: %w", err)
+	}
+	return count, nil
+}

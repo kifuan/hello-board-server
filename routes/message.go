@@ -25,6 +25,19 @@ func addMessageRoutes(rg *gin.RouterGroup) {
 		ctx.JSON(http.StatusOK, messages)
 	})
 
+	g.GET("/page_info", func(ctx *gin.Context) {
+		total, err := models.CountMessages()
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorJSON(err))
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"total": total,
+			"size":  models.PageSize,
+		})
+	})
+
 	g.POST("", func(ctx *gin.Context) {
 		var err error
 		var msg models.Message
