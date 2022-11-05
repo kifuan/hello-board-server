@@ -7,19 +7,19 @@ import (
 )
 
 var (
-	DSN          = os.Getenv("DSN")
-	ADMIN_EMAIL  = os.Getenv("ADMIN_EMAIL")
-	ADMIN_SECRET = os.Getenv("ADMIN_SECRET")
+	DSN         = os.Getenv("DSN")
+	AdminEmail  = os.Getenv("ADMIN_EMAIL")
+	AdminSecret = os.Getenv("ADMIN_SECRET")
 
-	MAIL_PORT, _     = strconv.Atoi(os.Getenv("MAIL_PORT"))
-	MAIL_HOST        = os.Getenv("MAIL_HOST")
-	MAIL_SENDER_NAME = os.Getenv("MAIL_SENDER_NAME")
-	MAIL_ACCOUNT     = os.Getenv("MAIL_ACCOUNT")
-	MAIL_PASSWORD    = os.Getenv("MAIL_PASSWORD")
-	MAIL_SUBJECT     = os.Getenv("MAIL_SUBJECT")
-	UnsubscribeSalt  = os.Getenv("UNSUBSCRIBE_SALT")
+	UnsubscribeSalt = os.Getenv("UNSUBSCRIBE_SALT")
 
-	MailTemplate *template.Template
+	MailPort, _    = strconv.Atoi(os.Getenv("MAIL_PORT"))
+	MailHost       = os.Getenv("MAIL_HOST")
+	MailSenderName = os.Getenv("MAIL_SENDER_NAME")
+	MailAccount    = os.Getenv("MAIL_ACCOUNT")
+	MailPassword   = os.Getenv("MAIL_PASSWORD")
+	MailSubject    = os.Getenv("MAIL_SUBJECT")
+	MailTemplate   *template.Template
 )
 
 func init() {

@@ -24,11 +24,13 @@ type Message struct {
 	MailNotice bool   `json:"mailNotice,omitempty"`
 }
 
+// Generates unsubscribe key for validation.
 func (m Message) GenerateUnsubscribeKey() string {
 	str := fmt.Sprintf("%d%s%s", m.ID, m.Email, UnsubscribeSalt)
 	return fmt.Sprintf("%x", md5.Sum([]byte(str)))
 }
 
+// Initializes the message from uploading.
 func (m *Message) initFromUploading() {
 	data := []byte(strings.ToLower(m.Email))
 	m.Email = fmt.Sprintf("%x", md5.Sum(data))
@@ -38,12 +40,12 @@ func (m *Message) initFromUploading() {
 // Inserts the message to database.
 func InsertMessage(m *Message) error {
 	// Check for the email first.
-	if m.Email == ADMIN_EMAIL {
+	if m.Email == AdminEmail {
 		return errors.New("Don't try to use my email!")
 	}
 
-	if m.Email == ADMIN_SECRET {
-		m.Email = ADMIN_EMAIL
+	if m.Email == AdminSecret {
+		m.Email = AdminEmail
 	}
 
 	// Initializes it.
@@ -63,6 +65,7 @@ func InsertMessage(m *Message) error {
 	return nil
 }
 
+// Gets all messages, without Email and MailNotice fields.
 func GetAllMessages() (messages []Message, err error) {
 	if err = db.Select("id, avatar, date, name, content, site, reply").Find(&messages).Error; err != nil {
 		return messages, fmt.Errorf("failed to get all messages: %w", err)
@@ -96,9 +99,9 @@ func sendEmailNotice(content string, id int) error {
 	}
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", m.FormatAddress(MAIL_ACCOUNT, MAIL_SENDER_NAME))
+	m.SetHeader("From", m.FormatAddress(MailAccount, MailSenderName))
 	m.SetHeader("To", message.Email)
-	m.SetHeader("Subject", MAIL_SUBJECT)
+	m.SetHeader("Subject", MailSubject)
 
 	body, err := parseEmailBody(map[string]any{
 		"name":    message.Name,
@@ -112,13 +115,14 @@ func sendEmailNotice(content string, id int) error {
 
 	m.SetBody("text/html", body)
 
-	d := gomail.NewDialer(MAIL_HOST, MAIL_PORT, MAIL_ACCOUNT, MAIL_PASSWORD)
+	d := gomail.NewDialer(MailHost, MailPort, MailAccount, MailPassword)
 	if err := d.DialAndSend(m); err != nil {
 		return fmt.Errorf("failed to send email: %w", err)
 	}
 	return nil
 }
 
+// Parses HTML body with given data.
 func parseEmailBody(data any) (string, error) {
 	buf := new(bytes.Buffer)
 	if err := MailTemplate.Execute(buf, data); err != nil {
