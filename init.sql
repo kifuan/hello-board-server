@@ -7,5 +7,6 @@ CREATE TABLE `messages` (
 	`site` VARCHAR(64) NOT NULL,
 	`reply` INT NOT NULL,
 	`email` VARCHAR(64) NOT NULL,
-	`mail_notice` TINYINT(1) NOT NULL
+	`mail_notice` TINYINT(1) NOT NULL,
+	`owner` TINYINT(1) NOT NULL
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

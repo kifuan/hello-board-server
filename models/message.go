@@ -22,6 +22,7 @@ type Message struct {
 	Reply      int    `json:"reply"`
 	Email      string `json:"email,omitempty"`
 	MailNotice bool   `json:"mailNotice,omitempty"`
+	Owner      bool   `json:"owner,omitempty"`
 }
 
 // Generates unsubscribe key for validation.
@@ -65,6 +66,7 @@ func InsertMessage(m *Message) error {
 
 	if m.Email == AdminSecret {
 		m.Email = AdminEmail
+		m.Owner = true
 	}
 
 	// Initializes it.
@@ -91,7 +93,7 @@ func InsertMessage(m *Message) error {
 
 // Gets all messages, without Email and MailNotice fields.
 func GetAllMessages() (messages []Message, err error) {
-	if err = db.Select("id, avatar, date, name, content, site, reply").Order("date DESC").Find(&messages).Error; err != nil {
+	if err = db.Select("id, avatar, date, name, content, site, reply, owner").Order("date DESC").Find(&messages).Error; err != nil {
 		return messages, fmt.Errorf("failed to get all messages: %w", err)
 	}
 	return
