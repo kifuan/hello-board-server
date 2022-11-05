@@ -51,7 +51,7 @@ func InsertMessage(m *Message) error {
 	// Initializes it.
 	m.initFromUploading()
 
-	if err := sendEmailNotice(m.Content, m.Reply); err != nil {
+	if err := sendEmailNotice(m.Name, m.Content, m.Reply); err != nil {
 		// We don't return this error because
 		// current message has no problem. It is
 		// due to the reply message.
@@ -92,7 +92,7 @@ func UnsubscribeMailNotice(id int) error {
 
 // Sends an email notice to specified id with reply content.
 // It does not handle -1 as id.
-func sendEmailNotice(content string, id int) error {
+func sendEmailNotice(replyName string, content string, id int) error {
 	if id == -1 {
 		return nil
 	}
@@ -112,11 +112,12 @@ func sendEmailNotice(content string, id int) error {
 	m.SetHeader("Subject", MailSubject)
 
 	body, err := parseEmailBody(map[string]any{
-		"name":    message.Name,
-		"content": content,
-		"id":      message.ID,
-		"key":     message.GenerateUnsubscribeKey(),
-		"site":    Site,
+		"name":      message.Name,
+		"content":   content,
+		"id":        message.ID,
+		"key":       message.GenerateUnsubscribeKey(),
+		"site":      Site,
+		"replyName": replyName,
 	})
 
 	if err != nil {
