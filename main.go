@@ -21,7 +21,7 @@ var loggerFile = &lumberjack.Logger{
 	MaxAge:     28, // Days
 }
 
-func initLogger() {
+func init() {
 	logrus.SetOutput(io.MultiWriter(os.Stdout, loggerFile))
 	gin.DisableConsoleColor()
 	gin.DefaultWriter = io.MultiWriter(os.Stdout, loggerFile)
@@ -39,12 +39,10 @@ func initLogger() {
 		logrus.SetLevel(logrus.InfoLevel)
 	}
 
-	logrus.Info("Logger initialized.")
+	logrus.Info("Logger is initialized.")
 }
 
 func main() {
-	initLogger()
-
 	models.Init()
 	defer models.Cleanup()
 
