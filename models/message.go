@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Message struct {
@@ -69,12 +67,10 @@ func InsertMessage(m *Message) error {
 	// Initializes it.
 	m.initFromUploading()
 
-	if err := sendEmailNotice(m.Name, m.Content, m.Reply); err != nil {
-		// We don't return this error because
-		// current message has no problem. It is
-		// due to the reply message.
-		logrus.Error(err)
-	}
+	// We don't care if they are sent,
+	// because it has no business with the current reply.
+	sendEmailNoticeIfAllowed(m.Name, m.Content, m.Reply)
+	sendOwnerNoticeIfEnabledAndRoot(*m)
 
 	// Fix the reply id, letting it reply to the root message.
 	if err := m.fixReply(); err != nil {

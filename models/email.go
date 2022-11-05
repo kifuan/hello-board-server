@@ -3,35 +3,56 @@ package models
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 
+	"github.com/sirupsen/logrus"
 	"gopkg.in/gomail.v2"
 )
 
+// Parses HTML body with given data.
+func parseEmailBody(tpl *template.Template, data any) (string, error) {
+	buf := new(bytes.Buffer)
+	if err := tpl.Execute(buf, data); err != nil {
+		return "", fmt.Errorf("failed to parse template: %w", err)
+	}
+	return buf.String(), nil
+}
+
+func sendEmail(subject, to, body string) error {
+	m := gomail.NewMessage()
+	m.SetHeader("From", m.FormatAddress(MailAccount, MailSenderName))
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/html", body)
+	d := gomail.NewDialer(MailHost, MailPort, MailAccount, MailPassword)
+	if err := d.DialAndSend(m); err != nil {
+		logrus.Warnf("failed to send email to %s: %s.", to, err)
+		return fmt.Errorf("failed to send email: %w", err)
+	}
+	logrus.Info("sent email to %s successfully.", to)
+	return nil
+}
+
 // Sends an email notice to specified id with reply content.
 // It does not handle -1 as id.
-func sendEmailNotice(replyName string, content string, id int) error {
+func sendEmailNoticeIfAllowed(replyName string, content string, id int) error {
 	if id == -1 {
 		return nil
 	}
 
-	message, err := GetFullMessage(id)
+	replyMessage, err := GetFullMessage(id)
 	if err != nil {
 		return err
 	}
 
-	if !message.MailNotice {
+	if !replyMessage.MailNotice {
 		return nil
 	}
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", m.FormatAddress(MailAccount, MailSenderName))
-	m.SetHeader("To", message.Email)
-	m.SetHeader("Subject", MailSubject)
-
-	body, err := parseEmailBody(map[string]any{
-		"name":      message.Name,
+	body, err := parseEmailBody(MailReplyTemplate, map[string]any{
+		"name":      replyMessage.Name,
 		"content":   content,
-		"key":       GenerateUnsubscribeEmailKey(message.Email),
+		"key":       GenerateUnsubscribeEmailKey(replyMessage.Email),
 		"site":      Site,
 		"replyName": replyName,
 	})
@@ -40,19 +61,30 @@ func sendEmailNotice(replyName string, content string, id int) error {
 		return err
 	}
 
-	m.SetBody("text/html", body)
-	d := gomail.NewDialer(MailHost, MailPort, MailAccount, MailPassword)
-	if err := d.DialAndSend(m); err != nil {
-		return fmt.Errorf("failed to send email: %w", err)
-	}
-	return nil
+	return sendEmail(MailSubject, replyMessage.Email, body)
 }
 
-// Parses HTML body with given data.
-func parseEmailBody(data any) (string, error) {
-	buf := new(bytes.Buffer)
-	if err := MailReplyTemplate.Execute(buf, data); err != nil {
-		return "", fmt.Errorf("failed to parse template: %w", err)
+// Sends notice to owner, if notice is enabled
+// and the current message replies to root.
+func sendOwnerNoticeIfEnabledAndRoot(m Message) error {
+	if !OwnerNotice {
+		return nil
 	}
-	return buf.String(), nil
+
+	if m.Reply != -1 {
+		return nil
+	}
+
+	body, err := parseEmailBody(MailOwnerTemplate, map[string]any{
+		"owner":   OwnerName,
+		"site":    Site,
+		"name":    m.Name,
+		"content": m.Content,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return sendEmail(OwnerSubject, OwnerEmail, body)
 }

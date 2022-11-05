@@ -16,6 +16,7 @@ var (
 	OwnerSecret    = os.Getenv("OWNER_SECRET")
 	OwnerNotice, _ = strconv.ParseBool(os.Getenv("OWNER_NOTICE"))
 	OwnerName      = os.Getenv("OWNER_NAME")
+	OwnerSubject   = os.Getenv("OWNER_SUBJECT")
 
 	MailPort, _       = strconv.Atoi(os.Getenv("MAIL_PORT"))
 	MailHost          = os.Getenv("MAIL_HOST")
