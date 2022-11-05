@@ -13,6 +13,7 @@ func Run() {
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 	rg := router.Group("/api")
 	addMessageRoutes(rg)
+	addUnsubscribeRoutes(rg)
 	router.Run(PORT)
 }
 

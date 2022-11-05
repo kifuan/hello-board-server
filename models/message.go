@@ -82,6 +82,14 @@ func GetFullMessage(id int) (m Message, err error) {
 	return
 }
 
+// Unsubscribes mail notice.
+func UnsubscribeMailNotice(id int) error {
+	if err := db.Model(&Message{}).Where("id=?", id).Update("mail_notice", false).Error; err != nil {
+		return fmt.Errorf("failed to unsubscribe: %w", err)
+	}
+	return nil
+}
+
 // Sends an email notice to specified id with reply content.
 // It does not handle -1 as id.
 func sendEmailNotice(content string, id int) error {
