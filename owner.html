@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+  <div style="margin: 0 auto; max-width: 720px; padding-top: 60px; padding-bottom: 60px">
+    <h1 style="line-height: 70px;font-size: 24px;font-weight: normal">
+      New Reply
+    </h1>
+    <p style="color: #6e6e6e;font-size: 13px;line-height: 24px">
+      Hello, {{.owner}}!
+    </p>
+    <p style="color: #6e6e6e;font-size: 13px;line-height: 24px">
+      Your website {{.site}} has a new message:
+    </p>
+    <p style="color: #6e6e6e;font-size: 13px;line-height: 24px;padding: 10px 20px;background: #f8f8f8;margin: 0">
+      {{.name}}: {{.content}}
+    </p>
+    <p style="color: #6e6e6e">
+      You can unsubscribe by setting <code>NOTICE_OWNER</code> in <code>.env</code> to <code>false</code>.
+    </p>
+  </div>
+</body>
+</html>

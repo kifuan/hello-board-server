@@ -57,12 +57,12 @@ func (m *Message) fixReply() error {
 // Inserts the message to database.
 func InsertMessage(m *Message) error {
 	// Check for the email first.
-	if m.Email == AdminEmail {
+	if m.Email == OwnerEmail {
 		return errors.New("Don't try to use my email!")
 	}
 
-	if m.Email == AdminSecret {
-		m.Email = AdminEmail
+	if m.Email == OwnerSecret {
+		m.Email = OwnerEmail
 		m.Owner = true
 	}
 

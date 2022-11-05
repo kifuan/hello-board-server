@@ -51,7 +51,7 @@ func sendEmailNotice(replyName string, content string, id int) error {
 // Parses HTML body with given data.
 func parseEmailBody(data any) (string, error) {
 	buf := new(bytes.Buffer)
-	if err := MailTemplate.Execute(buf, data); err != nil {
+	if err := MailReplyTemplate.Execute(buf, data); err != nil {
 		return "", fmt.Errorf("failed to parse template: %w", err)
 	}
 	return buf.String(), nil
