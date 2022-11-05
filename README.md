@@ -12,7 +12,13 @@ Backend server for [Hello Board](https://github.com/kifuan/hello-board).
 
 # Installation
 
-1. Prepare `.env`
+1. Clone this repository
+
+   ```bash
+git clone https://github.com/kifuan/hello-board-server.git
+   ```
+   
+2. Prepare `.env`
 
    A template `.env` is already provided. Just copy it to `.env`:
 
@@ -30,7 +36,7 @@ Backend server for [Hello Board](https://github.com/kifuan/hello-board).
    + `OWNER_SECRET`: it should be an email-like complex string. The **regex** we use to test in the front end is `/.+@.+\..+/`. Any string which follows this can be `OWNER_SECRET`.
    + `UNSUBSCRIBE_SALT`: it should be a complex string. Different from `OWNER_SECRET`, it can be any string you want. We use it to calculate `md5` for the unsubscribe key. 
 
-2. Prepare your database
+3. Prepare your database
 
    Create your database and source `init.sql`:
 
@@ -40,7 +46,7 @@ Backend server for [Hello Board](https://github.com/kifuan/hello-board).
    SOURCE init.sql;
    ```
 
-3. Simply build and deploy
+4. Simply build and deploy
 
    ```bash
    go get
