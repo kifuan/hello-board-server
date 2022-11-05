@@ -139,9 +139,12 @@ func UnsubscribeEmail(email string) error {
 	return nil
 }
 
-func CountMessages() (count int64, err error) {
-	if err = db.Model(&Message{}).Count(&count).Error; err != nil {
-		return 0, fmt.Errorf("failed to count: %w", err)
+func CountMessages() (totalCount int64, rootCount int64, err error) {
+	if err = db.Model(&Message{}).Count(&totalCount).Error; err != nil {
+		return 0, 0, fmt.Errorf("failed to count total: %w", err)
 	}
-	return count, nil
+	if err = db.Model(&Message{}).Where("reply=-1").Count(&rootCount).Error; err != nil {
+		return 0, 0, fmt.Errorf("failed to count root: %w", err)
+	}
+	return totalCount, rootCount, nil
 }

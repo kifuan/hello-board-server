@@ -26,15 +26,16 @@ func addMessageRoutes(rg *gin.RouterGroup) {
 	})
 
 	g.GET("/page_info", func(ctx *gin.Context) {
-		total, err := models.CountMessages()
+		total, root, err := models.CountMessages()
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorJSON(err))
 			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
-			"total": total,
-			"size":  models.PageSize,
+			"totalCount": total,
+			"rootCount":  root,
+			"pageSize":   models.PageSize,
 		})
 	})
 
