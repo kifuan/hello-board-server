@@ -68,10 +68,13 @@ func InsertMessage(m *Message) error {
 	// Initializes it.
 	m.initFromUploading()
 
-	// We don't care if they are sent,
-	// because it has no business with the current reply.
-	sendEmailNoticeIfAllowed(m.Name, m.Content, m.Reply)
-	sendOwnerNoticeIfEnabledAndRoot(*m)
+	go func() {
+		// We don't care if they are sent,
+		// because it has no business with the current reply.
+		// That's why a new goroutine is created to send emails.
+		sendEmailNoticeIfAllowed(m.Name, m.Content, m.Reply)
+		sendOwnerNoticeIfEnabledAndRoot(*m)
+	}()
 
 	// Fix the reply id, letting it reply to the root message.
 	if err := m.fixReply(); err != nil {
