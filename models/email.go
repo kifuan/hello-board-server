@@ -29,7 +29,7 @@ func sendEmail(subject, to, body string) error {
 		logrus.Warnf("failed to send email to %s: %s.", to, err)
 		return fmt.Errorf("failed to send email: %w", err)
 	}
-	logrus.Info("sent email to %s successfully.", to)
+	logrus.Infof("sent email to %s successfully.", to)
 	return nil
 }
 
